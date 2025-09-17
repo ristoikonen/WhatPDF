@@ -1,0 +1,151 @@
+﻿@page "/PDF"
+@rendermode InteractiveServer
+@using static ComponentEnums.PDFParams
+
+<PageTitle>PDF</PageTitle>
+
+<h1>PDF</h1>
+
+<EditForm Model="_model">
+    <InputRadioGroup @bind-Value="@_model.SelectedManufacturer">
+        Manufacturer:
+        <br>
+        @foreach (var manufacturer in Manufacturers)
+        {
+            <InputRadio Value="manufacturer" />
+            @manufacturer
+            <br>
+        }
+    </InputRadioGroup>
+    <InputCheckbox @bind-Value="_model.ReadImages" />
+    <label>ReadImages</label>
+
+    <InputCheckbox @bind-Value="_model.Compress" />
+    <label>Compress (LZ)</label>
+
+    <InputCheckbox @bind-Value="_model.RemoveStopwords" />
+    <label>Remove Stopwords</label>
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@* <EditForm Model="@this">
+    <InputRadioGroup Group @bind-Value="@_model.SelectedManufacturer">
+        Manufacturer:
+        <br>
+        @foreach (var manufacturer in Manufacturers)
+        {
+            <InputCheckbox DisplayName="manufacturer" ValueExpression="() => _model.IsChecked" />
+            @manufacturer
+            <br>
+        }
+    </InputRadioGroup>
+
+        <div>
+            <InputCheckbox Value="true" />
+            <label>Yes</label>
+        </div>
+        <div>
+            <InputCheckbox Value="false" />
+            <label>No</label>
+        </div>
+
+</EditForm> *@
+
+
+
+
+<p>Read PDF.</p>
+
+
+
+<div>Upload PDF:</div>
+<InputFile OnChange="HandleFileSelectedAsync" />
+<div>PDF</div>
+
+@((MarkupString)textchunk.Replace(Environment.NewLine, "<br />"))
+
+
+
+@code {
+
+    bool submitted = false;
+    [SupplyParameterFromForm]
+    private string? Name { get; set; }
+
+    private void Submit() => submitted = true;
+
+
+
+    // [Range(typeof(PDFParams), nameof(PDFParams),
+    // nameof(Manufacturer.VirginGalactic), ErrorMessage = "Pick a manufacturer.")]
+    // public Manufacturer Manufacturer { get; set; } = Manufacturer.Unknown;
+
+    List<String> Manufacturers = new List<string> { "Remove stopwords", "Compress(LZ)", "Read Images" };
+
+    FormModel _model = new FormModel();
+
+    //private FormModel model = new FormModel();
+
+
+    class FormModel
+    {
+        public String SelectedManufacturer { get; set; } = "Read Images";
+        public bool IsChecked { get; set; }
+        public bool ReadImages { get; set; } = true;
+        public bool RemoveStopwords { get; set; } = false;
+        public bool Compress { get; set; } = true;
+
+    }
+
+    private string textchunk = "";
+
+    // async Task
+    private async Task HandleFileSelectedAsync(InputFileChangeEventArgs e)
+    {
+        bool conmpress = _model.Compress;
+        bool readimages = _model.ReadImages;
+        bool removestopwords = _model.RemoveStopwords;
+
+        List<string>? textblocks = new List<string>();
+        var file = e.File;
+
+        //foreach (var file in e.GetMultipleFiles())
+        if (file is not null && file is IBrowserFile)
+        {
+                
+            var buffer = new byte[file.Size];
+            await Task.Delay(1);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                //await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(file.Size).CopyToAsync(memoryStream);
+                var byteArray = memoryStream.ToArray();
+
+                Reader reader = new Reader();
+                //await
+                var pdfdata = reader.ReadPdfData(byteArray, file.Name);
+
+                if (pdfdata is not null && pdfdata is PDFData && pdfdata.Pages is not null)
+                {
+                    string singleString = String.Join(Environment.NewLine, pdfdata.Pages);
+                    textchunk = singleString ?? "";
+                }
+            }
+
+        }
+
+
+        // Process each file here, e.g., read its content, save to server
+        // Example: Read file to a byte array
+        // var buffer = new byte[file.Size];
+        // await file.OpenReadStream().ReadAsync(buffer);
+
+        // Example: Save to wwwroot/Uploads
+        // var path = Path.Combine(env.WebRootPath, "uploads", file.Name);
+        // await using FileStream fs = new(path, FileMode.Create);
+        // await file.OpenReadStream().CopyToAsync(fs);
+        //}
+    }
+}

@@ -1,0 +1,60 @@
+﻿@using MudBlazor
+
+
+
+<MudAppBar Color="Color.Primary" Fixed="false">
+
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" Href="pdf" />
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="weather"  />
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Inherit" Href="pdf" />
+    <MudSpacer />
+</MudAppBar>
+
+
+@* 
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">WhatPDF</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="bi bi-plus-square-fill" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="pdf">
+                <span class="bi bi-list-nested" aria-hidden="true"></span> PDF
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+    </nav>
+</div> *@
+
+@code {
+    bool _drawerOpen = true;
+
+    void LoadPDF()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
