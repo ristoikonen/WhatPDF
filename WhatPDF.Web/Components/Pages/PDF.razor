@@ -1,6 +1,7 @@
 ﻿@page "/PDF"
 @rendermode InteractiveServer
 @using static ComponentEnums.PDFParams
+@using MudBlazor
 
 <PageTitle>PDF</PageTitle>
 
@@ -29,38 +30,38 @@
     <button type="submit">Submit</button>
 </EditForm>
 
-@* <EditForm Model="@this">
-    <InputRadioGroup Group @bind-Value="@_model.SelectedManufacturer">
-        Manufacturer:
-        <br>
-        @foreach (var manufacturer in Manufacturers)
-        {
-            <InputCheckbox DisplayName="manufacturer" ValueExpression="() => _model.IsChecked" />
-            @manufacturer
-            <br>
-        }
-    </InputRadioGroup>
-
-        <div>
-            <InputCheckbox Value="true" />
-            <label>Yes</label>
-        </div>
-        <div>
-            <InputCheckbox Value="false" />
-            <label>No</label>
-        </div>
-
-</EditForm> *@
+<MudText>
+    @_progress_msg
+</MudText>
+<MudProgressLinear Value="@progress_value" Rounded="true" Size="Size.Large" Color="Color.Info" BufferValue="@buffer_progress_value"/>
 
 
 
 
-<p>Read PDF.</p>
 
+
+<MudTimeline>
+    <MudTimelineItem>
+        <ItemContent>
+            <MudText>Open PDF</MudText>
+            <MudProgressLinear Value="@progress_value1" Rounded="true" Size="Size.Medium" Color="Color.Primary" />
+        </ItemContent>
+    </MudTimelineItem>
+    <MudTimelineItem Active="@showitem">
+        <MudText Align="Align.End">Read PDF</MudText>
+        <MudProgressLinear Value="@progress_value2" Rounded="true" Size="Size.Medium" Color="Color.Info" />
+    </MudTimelineItem>
+    <MudTimelineItem Color="Color.Primary">
+        <MudText>Read text</MudText>
+        <MudProgressLinear Value="@progress_value3" Rounded="true" Size="Size.Medium" Color="Color.Secondary" />
+    </MudTimelineItem>
+</MudTimeline>
 
 
 <div>Upload PDF:</div>
+
 <InputFile OnChange="HandleFileSelectedAsync" />
+
 <div>PDF</div>
 
 @((MarkupString)textchunk.Replace(Environment.NewLine, "<br />"))
@@ -70,11 +71,20 @@
 @code {
 
     bool submitted = false;
+    private bool _disposed;
+    private bool showitem = false;
+    
     [SupplyParameterFromForm]
     private string? Name { get; set; }
+    private string _progress_msg = "";
+    private int progress_value = 0;
+    private int progress_value1 = 0;
+    private int progress_value2 = 0;
+    private int progress_value3 = 0;
+    private int buffer_progress_value = 0;
+    private double _doubleValue;
 
     private void Submit() => submitted = true;
-
 
 
     // [Range(typeof(PDFParams), nameof(PDFParams),
@@ -85,8 +95,6 @@
 
     FormModel _model = new FormModel();
 
-    //private FormModel model = new FormModel();
-
 
     class FormModel
     {
@@ -95,12 +103,48 @@
         public bool ReadImages { get; set; } = true;
         public bool RemoveStopwords { get; set; } = false;
         public bool Compress { get; set; } = true;
-
     }
 
     private string textchunk = "";
 
-    // async Task
+    private void SetProgressValues(bool add, int val, string msg)
+    {
+        const int max = 100;
+        if(add)
+        {
+            progress_value += max >= (progress_value + val) ? val : 0 ;
+            buffer_progress_value = progress_value + 10 <= max ? progress_value + 10 : max;
+        }
+        else
+        {
+            progress_value = max >= (progress_value + val) ? val : 0;
+            buffer_progress_value = progress_value + 10 <= max ? progress_value + 10 : max;
+        }
+        _progress_msg = msg ?? "";  //!string.IsNullOrWhiteSpace(msg) ? msg;
+        StateHasChanged();
+    }
+
+    private void SetProgressStage(bool add, int valtotal, int val1, int val2, int val3, string msg)
+    {
+        const int max = 100;
+        if (add)
+        {
+            showitem = true;
+            progress_value1 += max >= (progress_value1 + val1) ? val1 : max;
+            progress_value2 += max >= (progress_value2 + val2) ? val2 : max;
+            progress_value3 += max >= (progress_value3 + val3) ? val3 : max;
+            //progress_value += max >= (progress_value + valtotal) ? valtotal : max;
+            buffer_progress_value = progress_value + 10 <= max ? progress_value + 10 : max;
+        }
+        else
+        {
+            progress_value = (max >= (progress_value + valtotal)) ? valtotal : 0;
+            buffer_progress_value = (progress_value + 10 <= max) ? progress_value + 10 : max;
+        }
+        _progress_msg = msg ?? "";  //!string.IsNullOrWhiteSpace(msg) ? msg;
+        StateHasChanged();
+    }
+
     private async Task HandleFileSelectedAsync(InputFileChangeEventArgs e)
     {
         bool conmpress = _model.Compress;
@@ -113,28 +157,62 @@
         //foreach (var file in e.GetMultipleFiles())
         if (file is not null && file is IBrowserFile)
         {
-                
+            var filename = file.Name ?? "";
+            _progress_msg = "Reading " + filename;
+			SetProgressValues(false, 10, _progress_msg);
+            SetProgressStage(true, 10, 10, 0, 0, _progress_msg);
+
             var buffer = new byte[file.Size];
-            await Task.Delay(1);
+            await Task.Delay(100);
+
+            SetProgressValues(false, 20, _progress_msg);
+            SetProgressStage(true, 20, 30, 10, 0, _progress_msg);
 
             using (var memoryStream = new MemoryStream())
             {
                 //await using FileStream fs = new(path, FileMode.Create);
                 await file.OpenReadStream(file.Size).CopyToAsync(memoryStream);
+                
+                SetProgressValues(false, 30, _progress_msg);
+                SetProgressStage(true, 20, 30, 10, 0, _progress_msg);
+
+                await Task.Delay(100);
+
                 var byteArray = memoryStream.ToArray();
 
                 Reader reader = new Reader();
                 //await
-                var pdfdata = reader.ReadPdfData(byteArray, file.Name);
+                _progress_msg = "Reading " + filename;
+                SetProgressValues(false, 40, _progress_msg);
+                SetProgressStage(true, 20, 60, 30, 0, _progress_msg);
+
+                await Task.Delay(100);
+
+                var pdfdata = reader.ReadPdfData(byteArray, filename);
+
+                SetProgressValues(false, 60, _progress_msg);
+                SetProgressStage(true, 10, 100, 40, 30, _progress_msg);
+                await Task.Delay(100);
 
                 if (pdfdata is not null && pdfdata is PDFData && pdfdata.Pages is not null)
                 {
+                    _progress_msg = "Have data of " + filename;
+					SetProgressValues(false, 90, _progress_msg);
+                    SetProgressStage(true, 20, 100, 100, 30, _progress_msg);
+                    await Task.Delay(100);
+
                     string singleString = String.Join(Environment.NewLine, pdfdata.Pages);
+                    SetProgressStage(true, 20, 100, 100, 20, _progress_msg);
                     textchunk = singleString ?? "";
                 }
             }
 
         }
+
+        _progress_msg = "Done!";
+        SetProgressValues(false, 100, _progress_msg);
+        SetProgressStage(true, 100, 100, 100, 100, _progress_msg);
+        await Task.Delay(100);
 
 
         // Process each file here, e.g., read its content, save to server

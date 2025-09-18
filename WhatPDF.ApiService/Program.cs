@@ -1,3 +1,7 @@
+using System.Text;
+using WhatPDF.ApiService.Endpoints;
+using WhatPDF.ApiService.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
@@ -34,6 +38,38 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+app.MapPost("/uploadpdf", async (Stream requestBody) =>
+{
+    if (requestBody == null)
+    {
+        return Results.BadRequest("Request body is empty.");
+    }
+
+    PdfHandlingModel pdfHandlingModel = new PdfHandlingModel
+    {
+        Compress = true,
+        ReadImages = false,
+        RemoveStopwords = true,
+        FileName = "uploaded.pdf"
+    };
+
+    byte[] requestBodyBytes;
+    using (var memoryStream = new MemoryStream())
+    {
+        await requestBody.CopyToAsync(memoryStream);
+        requestBodyBytes = memoryStream.ToArray();
+        PdfHandler.HandleFileSelectedAsync(requestBodyBytes, pdfHandlingModel).Wait();
+
+    }
+
+    // Read the stream content
+    //using var reader = new StreamReader(requestBody, Encoding.UTF8);
+    //var content = await reader.ReadToEndAsync();
+
+    return Results.Ok("File uploaded successfully.");
+});
+
 
 app.MapDefaultEndpoints();
 

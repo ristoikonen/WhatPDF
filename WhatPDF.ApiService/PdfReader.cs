@@ -13,8 +13,9 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.PageSegmenter;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 using UglyToad.PdfPig.Tokens;
+using WhatPDF.ApiService.Models;
 
-namespace WhatPDF.Web
+namespace WhatPDF.ApiService
 { 
     public class Reader
     {
@@ -36,7 +37,6 @@ namespace WhatPDF.Web
             List<string> blocks = new List<string>();
             StringBuilder pagetext = new StringBuilder();
             PDFData pdfdata = new PDFData();
-            int imgindex = 0;
             string stopwords = File.ReadAllText(@".\stopwords.txt");
 
             //var words2 = fileContents.Split(new[] { ' ', '\r', '\n', '\t', '.', ',', ';', ':', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
@@ -76,7 +76,7 @@ namespace WhatPDF.Web
                         {
                             //TODO: this actually creates a image file...!
                             //File.WriteAllBytes($"image_{imgindex++}.png", bytes);
-                            pdfimg.AddImage(bytes, @"PNG", $"image_{imgindex++}.png");
+                            pdfimg.AddImage(bytes, @"PNG", "");
                         }
                         else
                         {
@@ -84,7 +84,7 @@ namespace WhatPDF.Web
                             var rawbytes = pdfImage.RawMemory;
                             byte[]? bytearr = new byte[rawbytes.Length];
                             rawbytes.CopyTo(bytearr);
-                            pdfimg.AddImage(bytearr, @"RAW", $"image_{imgindex++}");
+                            pdfimg.AddImage(bytearr, @"RAW", "");
                         }
                         pdfdata.Images?.Add(pdfimg);
                     }
