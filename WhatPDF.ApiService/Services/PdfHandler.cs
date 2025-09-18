@@ -4,9 +4,9 @@ using WhatPDF.ApiService.Models;
 
 namespace WhatPDF.ApiService.Services;
 
-public static class PdfHandler
+public class PdfHandler : IPdfHandler
 {
-    public static async Task<PDFData?> HandleFileSelectedAsync(byte[] pdf, PdfHandlingModel pdfHandlingModel)
+    public async Task<PDFData?> HandleFileSelectedAsync(byte[] pdf, PdfHandlingModel pdfHandlingModel)
     {
         bool conmpress = pdfHandlingModel.Compress;
         bool readimages = pdfHandlingModel.ReadImages;

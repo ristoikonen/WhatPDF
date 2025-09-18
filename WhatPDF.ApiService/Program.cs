@@ -10,6 +10,20 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
+// Register a transient service
+//builder.Services.AddTransient<IQuickLZ, QuickLZ>();
+
+// Register a scoped service
+builder.Services.AddScoped<IPdfHandler, PdfHandler>();
+
+// We can register QuickLZ as singleton service as it's Compress and Decompress methods only operate on the passed-in data and local variables
+builder.Services.AddSingleton<IQuickLZ, QuickLZ>();
+
+builder.Services.AddSingleton<HashSet<string>>(StopWords.GetStopWordSet());
+// Example use of the StopWords -service
+// var words = text.ToLowerInvariant().Split(' ');
+// return words.Where(word => !_stopWords.Contains(word)).ToList();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -39,7 +53,7 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 
-app.MapPost("/uploadpdf", async (Stream requestBody) =>
+app.MapPost("/uploadpdf", async (IPdfHandler pdfHandler, Stream requestBody) =>
 {
     if (requestBody == null)
     {
@@ -59,7 +73,8 @@ app.MapPost("/uploadpdf", async (Stream requestBody) =>
     {
         await requestBody.CopyToAsync(memoryStream);
         requestBodyBytes = memoryStream.ToArray();
-        PdfHandler.HandleFileSelectedAsync(requestBodyBytes, pdfHandlingModel).Wait();
+        //pdfHandler = new ();
+        pdfHandler.HandleFileSelectedAsync(requestBodyBytes, pdfHandlingModel).Wait();
 
     }
 

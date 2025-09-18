@@ -1,0 +1,24 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+# https://localhost:7594;http://localhost:5578
+@hostname = localhost:7594
+@apiRoute1 = weatherforecast
+@apiRoute2 = uploadpdf
+@itemId = 1
+
+# Base URL for all requests
+@host = https://{{hostname}}
+
+###
+# 1. GET SAMPLE WEATHERFORECAST
+# Expected: 200 OK with a list of items in application/json format
+GET {{host}}/{{apiRoute1}}
+Accept: application/json
+
+###
+# 1. POST
+# Expected: 
+POST {{host}}/{{apiRoute2}}
+Content-Type: application/octet-stream 
+
+< ./large_data.bin
+

@@ -3,7 +3,7 @@ using System.Runtime.Intrinsics.X86;
 using WhatPDF.Web.Components.Pages;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace WhatPDF.Web;
+namespace WhatPDF.Web.Models;
 
     public class PDFImage
     {
@@ -12,7 +12,7 @@ namespace WhatPDF.Web;
 
         public void AddImage(byte[] img, string type, string name)
         {
-            this.Images.Add(new ImageData { Data = img, Type = type, Name = name });
+            Images.Add(new ImageData { Data = img, Type = type, Name = name });
         }
 
         // A nested class to represent a single image with its data and metadata
@@ -32,8 +32,8 @@ namespace WhatPDF.Web;
     {
         public PDFData()
         {
-            this.Pages = [];
-            this.Summary = [];
+            Pages = [];
+            Summary = [];
         }
         //
         public List<string>? Pages  { get; set; }

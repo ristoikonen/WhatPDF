@@ -1,7 +1,8 @@
 ﻿@page "/PDF"
 @rendermode InteractiveServer
-@using static ComponentEnums.PDFParams
 @using MudBlazor
+@using WhatPDF.Web.Models
+@using static ComponentEnums.PDFParams
 
 <PageTitle>PDF</PageTitle>
 
@@ -183,22 +184,23 @@
                 Reader reader = new Reader();
                 //await
                 _progress_msg = "Reading " + filename;
-                SetProgressValues(false, 40, _progress_msg);
+                SetProgressValues(false, 50, _progress_msg);
                 SetProgressStage(true, 20, 60, 30, 0, _progress_msg);
 
                 await Task.Delay(100);
 
                 var pdfdata = reader.ReadPdfData(byteArray, filename);
 
-                SetProgressValues(false, 60, _progress_msg);
+                SetProgressValues(false, 70, _progress_msg);
                 SetProgressStage(true, 10, 100, 40, 30, _progress_msg);
                 await Task.Delay(100);
 
                 if (pdfdata is not null && pdfdata is PDFData && pdfdata.Pages is not null)
                 {
-                    _progress_msg = "Have data of " + filename;
+                    _progress_msg = "Creating a string from " + filename;
 					SetProgressValues(false, 90, _progress_msg);
                     SetProgressStage(true, 20, 100, 100, 30, _progress_msg);
+
                     await Task.Delay(100);
 
                     string singleString = String.Join(Environment.NewLine, pdfdata.Pages);

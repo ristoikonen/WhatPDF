@@ -14,6 +14,7 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 using UglyToad.PdfPig.Tokens;
 using WhatPDF.ApiService.Models;
+using WhatPDF.ApiService.Services;
 
 namespace WhatPDF.ApiService
 { 
@@ -35,6 +36,7 @@ namespace WhatPDF.ApiService
         public PDFData? ReadPdfData(byte[] barr, string fileName)
         {
             List<string> blocks = new List<string>();
+            QuickLZ quickLZ = new QuickLZ();
             StringBuilder pagetext = new StringBuilder();
             PDFData pdfdata = new PDFData();
             string stopwords = File.ReadAllText(@".\stopwords.txt");
@@ -48,7 +50,7 @@ namespace WhatPDF.ApiService
 
             pdfdata.ReadDate = DateTime.Now;
             pdfdata.OriginalFileName = fileName;
-            pdfdata.Data = QuickLZ.compress(barr,3);
+            pdfdata.Data = quickLZ.Compress(barr,3);
 
             using (var document = UglyToad.PdfPig.PdfDocument.Open(barr))
             {
