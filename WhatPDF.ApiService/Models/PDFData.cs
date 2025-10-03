@@ -23,4 +23,6 @@ public class PDFData
     public Uri? Source { get; set; }
     public DateTime? ReadDate { get; set; } = DateTime.Now;
 
+    public string? Text { get; set; }
+
 }

@@ -52,7 +52,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         forecasts = await WeatherApi.GetWeatherAsync();
-        WeatherApi.PostPdf();
+        await WeatherApi.PostPdf();
     }
     
 }

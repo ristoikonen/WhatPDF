@@ -20,9 +20,8 @@ builder.Services.AddScoped<IPdfHandler, PdfHandler>();
 builder.Services.AddSingleton<IQuickLZ, QuickLZ>();
 
 builder.Services.AddSingleton<HashSet<string>>(StopWords.GetStopWordSet());
-// Example use of the StopWords -service
-// var words = text.ToLowerInvariant().Split(' ');
-// return words.Where(word => !_stopWords.Contains(word)).ToList();
+// 
+builder.Services.AddSingleton<IStopwords,Stopwords>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -74,8 +73,7 @@ app.MapPost("/uploadpdf", async (IPdfHandler pdfHandler, Stream requestBody) =>
         await requestBody.CopyToAsync(memoryStream);
         requestBodyBytes = memoryStream.ToArray();
         //pdfHandler = new ();
-        pdfHandler.HandleFileSelectedAsync(requestBodyBytes, pdfHandlingModel).Wait();
-
+        var pdfdata = await pdfHandler.HandleFileSelectedAsync(requestBodyBytes, pdfHandlingModel); //.Wait();
     }
 
     // Read the stream content

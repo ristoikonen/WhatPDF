@@ -5,7 +5,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace WhatPDF.Web.Models;
 
-    public class PDFImage
+    public class PDFImages
     {
         // A list to hold multiple images, each as a separate object
         public List<ImageData> Images { get; set; } = [];
@@ -39,7 +39,7 @@ namespace WhatPDF.Web.Models;
         public List<string>? Pages  { get; set; }
         public byte[]? Data  { get; set; }
         public List<string>? Summary { get; set; }
-        public List<PDFImage>? Images  { get; set; }
+        public PDFImages? Images  { get; set; }
         public string OriginalFileName { get; set; } = string.Empty;
         public Uri? Source { get; set; }
         public DateTime? ReadDate { get; set; } = DateTime.Now;

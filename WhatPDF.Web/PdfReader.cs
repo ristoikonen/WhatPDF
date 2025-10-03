@@ -38,7 +38,7 @@ namespace WhatPDF.Web
             StringBuilder pagetext = new StringBuilder();
             PDFData pdfdata = new PDFData();
             int imgindex = 0;
-            string stopwords = File.ReadAllText(@".\stopwords.txt");
+            string stopwords = File.ReadAllText(@".\.\resources\stopwords.txt");
 
             //var words2 = fileContents.Split(new[] { ' ', '\r', '\n', '\t', '.', ',', ';', ':', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -72,12 +72,12 @@ namespace WhatPDF.Web
                     foreach (var pdfImage in page.GetImages())
                     {
                         //TODO: compress large/all images?
-                        PDFImage pdfimg = new();
+                        PDFImages pdfimgs = new();
                         if (pdfImage.TryGetPng(out var bytes))
                         {
                             //TODO: this actually creates a image file...!
                             //File.WriteAllBytes($"image_{imgindex++}.png", bytes);
-                            pdfimg.AddImage(bytes, @"PNG", $"image_{imgindex++}.png");
+                            pdfimgs.AddImage(bytes, @"PNG", $"image_{imgindex++}.png");
                         }
                         else
                         {
@@ -85,9 +85,9 @@ namespace WhatPDF.Web
                             var rawbytes = pdfImage.RawMemory;
                             byte[]? bytearr = new byte[rawbytes.Length];
                             rawbytes.CopyTo(bytearr);
-                            pdfimg.AddImage(bytearr, @"RAW", $"image_{imgindex++}");
+                            pdfimgs.AddImage(bytearr, @"RAW", $"image_{imgindex++}");
                         }
-                        pdfdata.Images?.Add(pdfimg);
+                        pdfdata.Images = pdfimgs;
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace WhatPDF.Web
                     // 3. Images
                     foreach (var pdfImage in page.GetImages())
                     {
-                        PDFImage pdfimg = new();
+                        PDFImages pdfimg = new();
                         if (pdfImage.TryGetPng(out var bytes))
                         { 
                             File.WriteAllBytes($"image_{imgindex++}.png", bytes);
@@ -175,7 +175,7 @@ namespace WhatPDF.Web
                         }
                         
 
-                        pdfdata.Images?.Add(pdfimg);
+                        pdfdata.Images = pdfimg;
 
                     }
                 }

@@ -202,9 +202,9 @@
                     SetProgressStage(true, 20, 100, 100, 30, _progress_msg);
 
                     await Task.Delay(100);
+                    SetProgressStage(true, 20, 100, 100, 20, _progress_msg);
 
                     string singleString = String.Join(Environment.NewLine, pdfdata.Pages);
-                    SetProgressStage(true, 20, 100, 100, 20, _progress_msg);
                     textchunk = singleString ?? "";
                 }
             }

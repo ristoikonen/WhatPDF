@@ -13,10 +13,11 @@ public class PdfHandler : IPdfHandler
         bool removestopwords = pdfHandlingModel.RemoveStopwords;
         string filename = pdfHandlingModel.FileName ?? "unknown.pdf";
 
-        string textchunk = "";
         List<string>? textblocks = new List<string>();
         PDFData? pdfdata = null;
 
+        string stopwords1 = File.ReadAllText(@".\.\resources\stopwords.txt");
+        string stopwords2 = File.ReadAllText(@".\.\.\resources\stopwords.txt");
 
         if (pdf is not null && pdf.Length > 1)
         {
@@ -26,7 +27,6 @@ public class PdfHandler : IPdfHandler
             using (var memoryStream = new MemoryStream(pdf))
             {
                 //await file.OpenReadStream(file.Size).CopyToAsync(memoryStream);
-
                 //await Task.Delay(100);
 
                 var byteArray = memoryStream.ToArray();
@@ -37,7 +37,12 @@ public class PdfHandler : IPdfHandler
 
                 if (pdfdata is not null && pdfdata is PDFData && pdfdata.Pages is not null)
                 {
-                    textchunk = string.Join(Environment.NewLine, pdfdata.Pages);
+                    pdfdata.Text = string.Join(Environment.NewLine, pdfdata.Pages);
+                    foreach (var page in pdfdata.Pages)
+                    {
+                        pdfdata.Pages.Add(page);
+                    }
+                    
                 }
             }
         }
