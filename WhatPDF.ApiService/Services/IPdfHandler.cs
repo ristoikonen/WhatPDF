@@ -7,4 +7,9 @@ namespace WhatPDF.ApiService.Services
     {
         Task<PDFData?> HandleFileSelectedAsync(byte[] pdf, PdfHandlingModel pdfHandlingModel);
     }
+
+    public interface IJSONHandler
+    {
+        Task<string?> CreateJSONAsync(PdfHandlingModel pdfHandlingModel);
+    }
 }

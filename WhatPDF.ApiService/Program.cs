@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using WhatPDF.ApiService.Endpoints;
 using WhatPDF.ApiService.Services;
 
@@ -72,17 +73,50 @@ app.MapPost("/uploadpdf", async (IPdfHandler pdfHandler, Stream requestBody) =>
     {
         await requestBody.CopyToAsync(memoryStream);
         requestBodyBytes = memoryStream.ToArray();
-        //pdfHandler = new ();
         var pdfdata = await pdfHandler.HandleFileSelectedAsync(requestBodyBytes, pdfHandlingModel); //.Wait();
     }
 
-    // Read the stream content
     //using var reader = new StreamReader(requestBody, Encoding.UTF8);
     //var content = await reader.ReadToEndAsync();
 
     return Results.Ok("File uploaded successfully.");
 });
 
+
+app.MapGet("/createjson", async (JSONCreatorModel jsoncreatormodel) =>
+{
+    JSONCreatorModel jsoncreatormodel_test = new JSONCreatorModel
+    {
+        FileName = "test.json"
+    };
+
+    //string filePath = Path.Combine(Directory.GetCurrentDirectory(), jsoncreatormodel.FileName ?? "data.json");
+    //System.IO.File.WriteAllText(filePath, jsonString);
+
+    //string jsonString = JsonSerializer.Serialize(jsoncreatormodel, new JsonSerializerOptions { WriteIndented = true });
+    //return jsonString;
+
+    return await Task.FromResult(JsonSerializer.Serialize(jsoncreatormodel_test, new JsonSerializerOptions { WriteIndented = true }));
+
+});
+
+app.MapPost("/isvalidjson", async (string jsonstring) =>
+{
+    string jsonstring_test = new string("{\r\n  \"version\": 2\r\n}");
+    
+    try
+    {
+        using (JsonDocument.Parse(jsonstring_test))
+        {
+            return await Task.FromResult(true);
+        }
+    }
+    catch (JsonException)
+    {
+        return await Task.FromResult(false);
+    }
+
+});
 
 app.MapDefaultEndpoints();
 
